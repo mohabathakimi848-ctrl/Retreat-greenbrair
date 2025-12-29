@@ -11,102 +11,100 @@
 
 <body>
 
-  <!-- 🔐 LOGIN SCREEN -->
+<!-- 🔐 LOGIN GATE -->
 <div id="loginScreen" class="loginWrap">
   <div class="loginBox">
     <h2>Secure Access</h2>
 
-    <input id="loginEmail" type="email" placeholder="Email" required>
-    <input id="loginPassword" type="password" placeholder="Password" required>
-<button class="btn ghost" onclick="logout()">Logout</button>
+    <input id="loginEmail" type="email" placeholder="Email">
+    <input id="loginPassword" type="password" placeholder="Password">
 
     <button class="btn full" id="loginBtn">Login</button>
 
     <p id="loginError" class="loginError hidden">
-      Invalid credentials
+      Invalid email or password
     </p>
   </div>
 </div>
 
-<div class="row between topSwitch">
-  <div class="row">
-    <label class="miniLabel">Property</label>
-    <select id="propertySelect">
-      <option value="1">Retreat at Greenbriar 1</option>
-      <option value="2">Retreat at Greenbriar 2</option>
-    </select>
-  </div>
-<button class="btn ghost" onclick="logout()">Logout</button>
+<!-- 🔓 APP ROOT (LOCKED UNTIL LOGIN) -->
+<div id="appRoot" class="hidden">
 
-  <div class="row">
-    <button class="btn ghost" id="pickFolderBtn">📁 Choose Save Folder</button>
-    <button class="btn" id="saveFolderBtn">💾 Save Backup</button>
-  </div>
-</div>
+  <div class="row between topSwitch">
+    <div class="row">
+      <label class="miniLabel">Property</label>
+      <select id="propertySelect">
+        <option value="1">Retreat at Greenbriar 1</option>
+        <option value="2">Retreat at Greenbriar 2</option>
+      </select>
+    </div>
 
-<header class="topbar">
-  <div class="brand">
-    <img src="rjames.jpg" class="logo">
-    <div>
-      <h1 id="propertyTitle">Retreat at Greenbriar</h1>
-      <p class="sub">Business Manager</p>
+    <div class="row">
+      <button class="btn ghost" id="pickFolderBtn">📁 Choose Save Folder</button>
+      <button class="btn" id="saveFolderBtn">💾 Save Backup</button>
+      <button class="btn ghost" id="logoutBtn">Logout</button>
     </div>
   </div>
-</header>
 
-<main class="wrap">
+  <header class="topbar">
+    <div class="brand">
+      <img src="rjames.jpg" class="logo">
+      <div>
+        <h1 id="propertyTitle">Retreat at Greenbriar</h1>
+        <p class="sub">Make-Ready Manager</p>
+      </div>
+    </div>
+  </header>
 
-<section class="card">
-  <h2>Add Unit</h2>
-  <form id="unitForm" class="grid">
-    <input name="unitNumber" placeholder="Unit #" required>
+  <main class="wrap">
 
-    <select name="status">
-      <option>Vacant</option>
-      <option selected>Not Ready</option>
-      <option>Ready</option>
-      <option>Occupied</option>
-    </select>
+    <!-- MANAGER PANEL -->
+    <section id="managerPanel" class="card hidden">
+      <h2>Manager Settings</h2>
 
-    <!-- Pickable + typeable date -->
-    <input
-      type="date"
-      class="edit-date datePick"
-      placeholder="YYYY-MM-DD"
-    >
+      <h3>Change Manager Password</h3>
+      <input id="newManagerPassword" type="password" placeholder="New manager password">
+      <button class="btn" id="updateManagerPwd">Update</button>
 
-    <textarea name="notes" placeholder="Unit notes" class="full"></textarea>
+      <hr>
 
-    <button class="btn full">Add Unit</button>
-  </form>
-</section>
+      <h3>Staff Users</h3>
+      <div id="staffList"></div>
+    </section>
 
-<section class="card">
-  <div class="row between">
-    <h2>Units</h2>
-    <input id="search" placeholder="Search anything…">
-  </div>
-  <div id="unitList"></div>
-</section>
+    <section class="card">
+      <h2>Add Unit</h2>
+      <form id="unitForm" class="grid">
+        <input name="unitNumber" placeholder="Unit #" required>
 
-</main>
-<section id="managerPanel" class="card hidden">
-  <h2>Manager Settings</h2>
+        <select name="status">
+          <option>Vacant</option>
+          <option selected>Not Ready</option>
+          <option>Ready</option>
+          <option>Occupied</option>
+        </select>
 
-  <h3>Change Manager Password</h3>
-  <input id="newManagerPassword" type="password" placeholder="New manager password">
-  <button class="btn" onclick="changeManagerPassword()">Update</button>
+        <input type="date" class="datePick" name="start">
+        <textarea name="notes" placeholder="Unit notes" class="full"></textarea>
 
-  <hr>
+        <button class="btn full">Add Unit</button>
+      </form>
+    </section>
 
-<h3>Staff Users</h3>
-<div id="staffList"></div>
+    <section class="card">
+      <div class="row between">
+        <h2>Units</h2>
+        <input id="search" placeholder="Search anything…">
+      </div>
+      <div id="unitList"></div>
+    </section>
 
-</section>
+  </main>
+
+</div>
 
 <template id="unitTemplate">
   <article class="unit">
-
     <div class="row between">
       <h3 class="unitName"></h3>
       <div class="row">
@@ -122,25 +120,15 @@
     <p class="notes"></p>
 
     <section class="details hidden">
-
       <div class="row">
         <select class="taskPicker"></select>
         <input class="taskVendor" placeholder="Vendor / Staff">
-
-        <!-- Pickable + typeable date -->
-        <input
-          type="date"
-          class="taskDate datePick"
-          placeholder="YYYY-MM-DD"
-        >
-
+        <input type="date" class="taskDate datePick">
         <select class="taskStatus">
           <option value="pending">Pending</option>
           <option value="done">Done</option>
         </select>
-
         <textarea class="taskNote" rows="2" placeholder="Task note"></textarea>
-
         <button class="btn ghost small addTask">Add Task</button>
       </div>
 
@@ -148,73 +136,26 @@
 
       <label class="row">
         Work Finish Date
-        <input
-          type="date"
-          class="finishDate datePick"
-          placeholder="YYYY-MM-DD"
-        >
+        <input type="date" class="finishDate datePick">
       </label>
-
     </section>
-
   </article>
 </template>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="app.js"></script>
 
-<!-- ✅ DATE PICKER PRIORITY SCRIPT -->
 <script>
-  function enableDatePickers() {
-    document.querySelectorAll('input[type="date"], .datePick').forEach(input => {
-      const openPicker = () => {
-        if (typeof input.showPicker === "function") {
-          input.showPicker();
-        }
-      };
-
-      input.addEventListener("click", openPicker);
-      input.addEventListener("focus", openPicker);
-      input.addEventListener("pointerdown", openPicker);
-    });
-  }
-
-  document.addEventListener("DOMContentLoaded", enableDatePickers);
-
-  // Also re-apply when new tasks are added dynamically
-  const observer = new MutationObserver(enableDatePickers);
-  observer.observe(document.body, { childList: true, subtree: true });
-</script>
-
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker.register("./service-worker.js")
-        .then(reg => console.log("Service Worker registered:", reg.scope))
-        .catch(err => console.error("SW registration failed:", err));
-    });
-  }
-</script>
-
-<script>
-  if ("serviceWorker" in navigator) {
-    window.addEventListener("load", () => {
-      navigator.serviceWorker
-        .register("./service-worker.js")
-        .then(reg => console.log("✅ Service Worker registered:", reg.scope))
-        .catch(err => console.error("❌ Service Worker failed:", err));
-    });
-  }
+if ("serviceWorker" in navigator) {
+  window.addEventListener("load", () => {
+    navigator.serviceWorker.register("./service-worker.js");
+  });
+}
 </script>
 
 </body>
 
 <footer class="siteFooter">
-  Mohabatullah Hakimi, 2025/12/25
+  Mohabatullah Hakimi © 2025
 </footer>
-
 </html>
-
-
-
-
