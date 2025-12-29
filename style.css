@@ -1,0 +1,118 @@
+/* ===== BASE ===== */
+html, body{
+  background:#0b1220;
+  color:#e5e7eb;
+  font-family:system-ui;
+  margin:0;
+  transform:none !important; /* 🔒 prevents fixed-position breaking */
+}
+
+.topSwitch{padding:10px 16px;background:#020617}
+.topbar{background:linear-gradient(180deg,#0f172a,#020617);padding:16px}
+.brand{display:flex;gap:14px;align-items:center}
+.logo{height:48px;background:#fff;padding:4px;border-radius:6px}
+.sub{color:#94a3b8}
+
+.wrap{max-width:980px;margin:auto;padding:16px}
+.card{background:#111827;border-radius:14px;padding:14px;margin-bottom:14px}
+.grid{display:grid;gap:10px}
+.full{grid-column:1/-1}
+
+input,select,textarea{
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #1f2937;
+  background:#0c1426;
+  color:#fff
+}
+
+.btn{
+  padding:10px;
+  border-radius:10px;
+  border:none;
+  background:#60a5fa;
+  color:#000;
+  font-weight:800
+}
+
+.btn.ghost{background:transparent;color:#fff;border:1px solid #1f2937}
+.btn.success{background:#22c55e}
+.btn.danger{background:#fb7185}
+.small{padding:6px 8px;font-size:12px}
+
+.unit{
+  border:1px solid #1f2937;
+  border-radius:12px;
+  padding:12px;
+  margin-bottom:10px
+}
+
+.unitBadge{
+  background:#16a34a;
+  color:#000;
+  padding:4px 8px;
+  border-radius:6px;
+  font-size:12px
+}
+
+.hidden{display:none}
+
+.row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.between{justify-content:space-between}
+
+/* === TASK ROW (PAGE SAFE) === */
+.task{
+  border:1px dashed #1f2937;
+  border-radius:10px;
+  padding:6px 8px;
+  margin-top:6px;
+
+  display:grid;
+  grid-template-columns:
+    minmax(110px,1.2fr)
+    minmax(100px,1fr)
+    110px
+    90px
+    minmax(120px,1.5fr)
+    auto auto;
+
+  gap:6px;
+  align-items:center;
+
+  width:100%;
+  box-sizing:border-box;
+  overflow:hidden
+}
+
+.task button{
+  white-space:nowrap;
+  padding:5px 7px;
+  font-size:11px
+}
+
+/* === LEGENDARY COMPLETED TASK === */
+.task.done{
+  background:linear-gradient(90deg,#020617,#052e16);
+  color:#86efac;
+  border:1px solid #22c55e;
+
+  grid-template-columns:1fr auto auto;
+  padding:6px 10px
+}
+
+.task.done .edit-vendor,
+.task.done .edit-date,
+.task.done .edit-note{
+  display:none
+}
+
+/* ===== PERMANENT FIXED FOOTER (SIGNATURE) ===== */
+.siteFooter{
+  position:fixed;
+  inset:auto auto 18px 16px; /* bottom-left, viewport anchored */
+  font-size:12px;
+  color:#94a3b8;
+  opacity:0.85;
+  pointer-events:none;
+  z-index:2147483647; /* 🔒 always stays put */
+}

@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Retreat at Greenbriar</title>
+
+  <link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+
+<div class="row between topSwitch">
+  <div class="row">
+    <label class="miniLabel">Property</label>
+    <select id="propertySelect">
+      <option value="1">Retreat at Greenbriar 1</option>
+      <option value="2">Retreat at Greenbriar 2</option>
+    </select>
+  </div>
+
+  <div class="row">
+    <button class="btn ghost" id="pickFolderBtn">📁 Choose Save Folder</button>
+    <button class="btn" id="saveFolderBtn">💾 Save Backup</button>
+  </div>
+</div>
+
+<header class="topbar">
+  <div class="brand">
+    <img src="rjames.jpg" class="logo">
+    <div>
+      <h1 id="propertyTitle">Retreat at Greenbriar</h1>
+      <p class="sub">Business Manager</p>
+    </div>
+  </div>
+</header>
+
+<main class="wrap">
+
+<section class="card">
+  <h2>Add Unit</h2>
+  <form id="unitForm" class="grid">
+    <input name="unitNumber" placeholder="Unit #" required>
+
+    <select name="status">
+      <option>Vacant</option>
+      <option selected>Not Ready</option>
+      <option>Ready</option>
+      <option>Occupied</option>
+    </select>
+
+    <!-- Pickable + typeable date -->
+    <input
+      type="date"
+      class="edit-date datePick"
+      placeholder="YYYY-MM-DD"
+    >
+
+    <textarea name="notes" placeholder="Unit notes" class="full"></textarea>
+
+    <button class="btn full">Add Unit</button>
+  </form>
+</section>
+
+<section class="card">
+  <div class="row between">
+    <h2>Units</h2>
+    <input id="search" placeholder="Search anything…">
+  </div>
+  <div id="unitList"></div>
+</section>
+
+</main>
+
+<template id="unitTemplate">
+  <article class="unit">
+
+    <div class="row between">
+      <h3 class="unitName"></h3>
+      <div class="row">
+        <span class="unitBadge hidden">✅ COMPLETED</span>
+        <button class="btn ghost small toggleDetails">Details</button>
+        <button class="btn ghost small pdfBtn">PDF</button>
+        <button class="btn success small markDone">Mark Unit Done</button>
+        <button class="btn danger small deleteUnit">Delete</button>
+      </div>
+    </div>
+
+    <p class="dates"></p>
+    <p class="notes"></p>
+
+    <section class="details hidden">
+
+      <div class="row">
+        <select class="taskPicker"></select>
+        <input class="taskVendor" placeholder="Vendor / Staff">
+
+        <!-- Pickable + typeable date -->
+        <input
+          type="date"
+          class="taskDate datePick"
+          placeholder="YYYY-MM-DD"
+        >
+
+        <select class="taskStatus">
+          <option value="pending">Pending</option>
+          <option value="done">Done</option>
+        </select>
+
+        <textarea class="taskNote" rows="2" placeholder="Task note"></textarea>
+
+        <button class="btn ghost small addTask">Add Task</button>
+      </div>
+
+      <div class="tasks"></div>
+
+      <label class="row">
+        Work Finish Date
+        <input
+          type="date"
+          class="finishDate datePick"
+          placeholder="YYYY-MM-DD"
+        >
+      </label>
+
+    </section>
+
+  </article>
+</template>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="app.js"></script>
+
+<!-- ✅ DATE PICKER PRIORITY SCRIPT -->
+<script>
+  function enableDatePickers() {
+    document.querySelectorAll('input[type="date"], .datePick').forEach(input => {
+      const openPicker = () => {
+        if (typeof input.showPicker === "function") {
+          input.showPicker();
+        }
+      };
+
+      input.addEventListener("click", openPicker);
+      input.addEventListener("focus", openPicker);
+      input.addEventListener("pointerdown", openPicker);
+    });
+  }
+
+  document.addEventListener("DOMContentLoaded", enableDatePickers);
+
+  // Also re-apply when new tasks are added dynamically
+  const observer = new MutationObserver(enableDatePickers);
+  observer.observe(document.body, { childList: true, subtree: true });
+</script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("./service-worker.js")
+        .then(reg => console.log("Service Worker registered:", reg.scope))
+        .catch(err => console.error("SW registration failed:", err));
+    });
+  }
+</script>
+
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker
+        .register("./service-worker.js")
+        .then(reg => console.log("✅ Service Worker registered:", reg.scope))
+        .catch(err => console.error("❌ Service Worker failed:", err));
+    });
+  }
+</script>
+
+</body>
+
+<footer class="siteFooter">
+  Mohabatullah Hakimi, 2025/12/25
+</footer>
+
+</html>
