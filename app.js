@@ -1,3 +1,68 @@
+/* ===== AUTH ===== */
+
+const DEFAULT_USERS = {
+  manager: {
+    email: "manager@rjames.com",
+    password: "manager123"
+  },
+  staff: {
+    email: "staff@rjames.com",
+    password: "staff123"
+  }
+};
+
+// Load users or init defaults
+let USERS = JSON.parse(localStorage.getItem("USERS")) || DEFAULT_USERS;
+localStorage.setItem("USERS", JSON.stringify(USERS));
+
+let CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
+
+document.addEventListener("DOMContentLoaded", () => {
+  if (!CURRENT_USER) {
+    document.getElementById("loginScreen").classList.remove("hidden");
+  } else {
+    applyRoleRestrictions();
+  }
+
+  document.getElementById("loginBtn").onclick = login;
+});
+
+function login(){
+  const email = loginEmail.value.trim();
+  const password = loginPassword.value.trim();
+
+  const role = Object.keys(USERS).find(r =>
+    USERS[r].email === email &&
+    USERS[r].password === password
+  );
+
+  if (!role) {
+    loginError.classList.remove("hidden");
+    return;
+  }
+
+  CURRENT_USER = { role, email };
+  localStorage.setItem("CURRENT_USER", JSON.stringify(CURRENT_USER));
+
+  document.getElementById("loginScreen").classList.add("hidden");
+  applyRoleRestrictions();
+}
+
+function logout(){
+  localStorage.removeItem("CURRENT_USER");
+  location.reload();
+}
+function applyRoleRestrictions(){
+  const isStaff = CURRENT_USER.role === "staff";
+
+  if (isStaff) {
+    document.querySelectorAll(".deleteUnit").forEach(b => b.remove());
+    document.querySelectorAll(".pdfBtn").forEach(b => b.remove());
+    document.getElementById("pickFolderBtn")?.remove();
+    document.getElementById("saveFolderBtn")?.remove();
+  }
+}
+
 const TASK_TYPES = [
   "Cleaning","Painting","Flooring","Maintenance",
   "Electrical","Plumbing","Pest Control","HVAC","Final Inspection"
@@ -475,3 +540,4 @@ async function saveBackupToFolder() {
   await w.write(JSON.stringify(await getAll(),null,2));
   await w.close();
 }
+
