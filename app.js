@@ -15,27 +15,48 @@ localStorage.setItem("USERS", JSON.stringify(USERS));
 
 let CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
 
-// ✅ FIX: bind login elements explicitly (no deletions)
+// 🔐 LOGIN ELEMENTS
 let loginEmail, loginPassword, loginError;
 
+// 🧱 APP ELEMENTS (FIX)
+let propertySelect, propertyTitle;
+let pickFolderBtn, saveFolderBtn, logoutBtn;
+let unitForm, search, unitList, unitTemplate;
+let managerPanel, staffList;
+
+/* ================= DOM READY ================= */
+
 document.addEventListener("DOMContentLoaded", () => {
-  // ✅ FIX: safe bindings
+
+  // 🔐 LOGIN
   loginEmail = document.getElementById("loginEmail");
   loginPassword = document.getElementById("loginPassword");
   loginError = document.getElementById("loginError");
 
+  // 🧱 APP
+  propertySelect = document.getElementById("propertySelect");
+  propertyTitle = document.getElementById("propertyTitle");
+  pickFolderBtn = document.getElementById("pickFolderBtn");
+  saveFolderBtn = document.getElementById("saveFolderBtn");
+  logoutBtn = document.getElementById("logoutBtn");
+
+  unitForm = document.getElementById("unitForm");
+  search = document.getElementById("search");
+  unitList = document.getElementById("unitList");
+  unitTemplate = document.getElementById("unitTemplate");
+
+  managerPanel = document.getElementById("managerPanel");
+  staffList = document.getElementById("staffList");
+
   document.getElementById("loginBtn").onclick = login;
-  document.getElementById("logoutBtn").onclick = logout;
+  logoutBtn.onclick = logout;
   document.getElementById("updateManagerPwd").onclick = changeManagerPassword;
 
-  if (CURRENT_USER) {
-    unlockApp();
-  } else {
-    lockApp();
-  }
+  if (CURRENT_USER) unlockApp();
+  else lockApp();
 });
 
-/* ===== LOGIN FLOW ===== */
+/* ================= LOGIN FLOW ================= */
 
 function lockApp(){
   document.getElementById("loginScreen").classList.remove("hidden");
@@ -46,7 +67,7 @@ function unlockApp(){
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("appRoot").classList.remove("hidden");
   applyRoleRestrictions();
-  initApp(); // start main app only AFTER login
+  initApp();
 }
 
 function login(){
@@ -54,16 +75,12 @@ function login(){
   const password = loginPassword.value.trim();
   loginError.classList.add("hidden");
 
-  if (
-    USERS.manager.email === email &&
-    USERS.manager.password === password
-  ) {
+  if (USERS.manager.email === email && USERS.manager.password === password) {
     CURRENT_USER = { role: "manager", email };
   } else {
     const staffUser = USERS.staff.find(
       u => u.email === email && u.password === password
     );
-
     if (!staffUser) {
       loginError.classList.remove("hidden");
       return;
@@ -81,24 +98,22 @@ function logout(){
   lockApp();
 }
 
-/* ===== ROLE CONTROL ===== */
+/* ================= ROLE CONTROL ================= */
 
 function applyRoleRestrictions(){
   if (CURRENT_USER.role === "manager") {
-    document.getElementById("managerPanel").classList.remove("hidden");
+    managerPanel.classList.remove("hidden");
     renderStaffList();
     return;
   }
 
-  // staff restrictions
-  document.getElementById("managerPanel")?.remove();
-  document.querySelectorAll(".deleteUnit").forEach(b => b.remove());
-  document.querySelectorAll(".pdfBtn").forEach(b => b.remove());
-  document.getElementById("pickFolderBtn")?.remove();
-  document.getElementById("saveFolderBtn")?.remove();
+  managerPanel.remove();
+  document.querySelectorAll(".deleteUnit,.pdfBtn").forEach(b => b.remove());
+  pickFolderBtn.remove();
+  saveFolderBtn.remove();
 }
 
-/* ===== MANAGER ACTIONS ===== */
+/* ================= MANAGER ================= */
 
 function changeManagerPassword(){
   const pwd = newManagerPassword.value.trim();
@@ -110,34 +125,8 @@ function changeManagerPassword(){
   alert("Manager password updated");
 }
 
-function addStaff(email, password){
-  USERS.staff.push({ email, password });
-  localStorage.setItem("USERS", JSON.stringify(USERS));
-  renderStaffList();
-}
-
-function removeStaff(email){
-  USERS.staff = USERS.staff.filter(u => u.email !== email);
-  localStorage.setItem("USERS", JSON.stringify(USERS));
-  renderStaffList();
-}
-
-function resetStaffPassword(email){
-  const pwd = prompt(`New password for ${email}`);
-  if (!pwd || pwd.length < 4) return alert("Invalid password");
-
-  const staff = USERS.staff.find(u => u.email === email);
-  if (!staff) return;
-
-  staff.password = pwd;
-  localStorage.setItem("USERS", JSON.stringify(USERS));
-  alert("Password reset");
-}
-
 function renderStaffList(){
-  const box = document.getElementById("staffList");
-  box.innerHTML = "";
-
+  staffList.innerHTML = "";
   USERS.staff.forEach(u => {
     const row = document.createElement("div");
     row.className = "staffRow";
@@ -148,23 +137,17 @@ function renderStaffList(){
         <button class="btn danger small" onclick="removeStaff('${u.email}')">Remove</button>
       </div>
     `;
-    box.appendChild(row);
+    staffList.appendChild(row);
   });
 }
 
 /* ================= MAIN APP ================= */
-
-const TASK_TYPES = [
-  "Cleaning","Painting","Flooring","Maintenance",
-  "Electrical","Plumbing","Pest Control","HVAC","Final Inspection"
-];
 
 let PROPERTY = localStorage.getItem("property") || "1";
 let DB_NAME = `RetreatMakeReadyDB_${PROPERTY}`;
 const STORE = "units";
 let db = null;
 let folderHandle = null;
-let openDetails = new Set();
 
 async function initApp(){
   propertySelect.value = PROPERTY;
@@ -184,7 +167,7 @@ async function initApp(){
   render();
 }
 
-/* ===== DATABASE ===== */
+/* ================= DATABASE ================= */
 
 function openDB(){
   return new Promise(res => {
@@ -201,14 +184,15 @@ const getAll = () => new Promise(res => {
   r.onsuccess = () => res(r.result || []);
 });
 
-/* ===== UNITS ===== */
+/* ================= UNITS ================= */
 
 async function addUnit(e){
   e.preventDefault();
   const f = new FormData(e.target);
   const unitNumber = f.get("unitNumber").trim().toUpperCase();
 
-  if (await isDuplicateUnit(unitNumber))
+  const units = await getAll();
+  if (units.some(u => u.unitNumber === unitNumber))
     return alert("Unit already exists");
 
   await store("readwrite").put({
@@ -226,28 +210,20 @@ async function addUnit(e){
   render();
 }
 
-async function isDuplicateUnit(unit){
-  const units = await getAll();
-  return units.some(u => u.unitNumber === unit);
-}
-
 async function render(){
   unitList.innerHTML = "";
   const units = await getAll();
-  units.forEach(u => unitList.appendChild(renderUnit(u)));
+  units.forEach(u => {
+    const el = unitTemplate.content.cloneNode(true).querySelector(".unit");
+    el.querySelector(".unitName").textContent = u.unitNumber;
+    el.querySelector(".notes").textContent = u.notes || "";
+    el.querySelector(".dates").textContent =
+      `Start: ${u.start || "-"} | Finish: ${u.finish || "-"}`;
+    unitList.appendChild(el);
+  });
 }
 
-function renderUnit(unit){
-  const el = unitTemplate.content.cloneNode(true).querySelector(".unit");
-  el.querySelector(".unitName").textContent = unit.unitNumber;
-  el.querySelector(".notes").textContent = unit.notes || "";
-  el.querySelector(".dates").textContent =
-    `Start: ${unit.start || "-"} | Finish: ${unit.finish || "-"}`;
-
-  return el;
-}
-
-/* ===== BACKUP ===== */
+/* ================= BACKUP ================= */
 
 async function pickFolder(){
   folderHandle = await window.showDirectoryPicker();
