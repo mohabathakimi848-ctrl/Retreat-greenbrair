@@ -65,6 +65,71 @@ function login(){
 function logout(){
   localStorage.removeItem("CURRENT_USER");
   location.reload();
+  function applyRoleRestrictions(){
+  if (CURRENT_USER.role === "manager") {
+    document.getElementById("managerPanel").classList.remove("hidden");
+    renderStaffList();
+    return;
+  }
+
+  // staff restrictions
+  document.getElementById("managerPanel")?.remove();
+  document.querySelectorAll(".deleteUnit").forEach(b => b.remove());
+  document.querySelectorAll(".pdfBtn").forEach(b => b.remove());
+  document.getElementById("pickFolderBtn")?.remove();
+  document.getElementById("saveFolderBtn")?.remove();
+}
+
+function changeManagerPassword(){
+  const pwd = newManagerPassword.value.trim();
+  if (pwd.length < 4) return alert("Password too short");
+
+  USERS.manager.password = pwd;
+  localStorage.setItem("USERS", JSON.stringify(USERS));
+  newManagerPassword.value = "";
+  alert("Manager password updated");
+}
+
+function addStaff(){
+  const email = staffEmail.value.trim();
+  const pwd = staffPassword.value.trim();
+
+  if (!email || !pwd) return alert("Fill all fields");
+
+  if (USERS.staff.some(u => u.email === email))
+    return alert("Staff already exists");
+
+  USERS.staff.push({ email, password: pwd });
+  localStorage.setItem("USERS", JSON.stringify(USERS));
+
+  staffEmail.value = "";
+  staffPassword.value = "";
+  renderStaffList();
+}
+
+function removeStaff(email){
+  USERS.staff = USERS.staff.filter(u => u.email !== email);
+  localStorage.setItem("USERS", JSON.stringify(USERS));
+  renderStaffList();
+}
+
+function renderStaffList(){
+  const box = document.getElementById("staffList");
+  box.innerHTML = "";
+
+  USERS.staff.forEach(u => {
+    const row = document.createElement("div");
+    row.className = "staffRow";
+    row.innerHTML = `
+      <span>${u.email}</span>
+      <button class="btn danger small" onclick="removeStaff('${u.email}')">
+        Remove
+      </button>
+    `;
+    box.appendChild(row);
+  });
+}
+
 }
 function applyRoleRestrictions(){
   const isStaff = CURRENT_USER.role === "staff";
@@ -554,5 +619,6 @@ async function saveBackupToFolder() {
   await w.write(JSON.stringify(await getAll(),null,2));
   await w.close();
 }
+
 
 
