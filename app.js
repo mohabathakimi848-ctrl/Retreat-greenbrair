@@ -120,15 +120,23 @@ function renderStaffList(){
   USERS.staff.forEach(u => {
     const row = document.createElement("div");
     row.className = "staffRow";
+
     row.innerHTML = `
       <span>${u.email}</span>
-      <button class="btn danger small" onclick="removeStaff('${u.email}')">
-        Remove
-      </button>
+      <div class="row">
+        <button class="btn small ghost" onclick="resetStaffPassword('${u.email}')">
+          Reset Password
+        </button>
+        <button class="btn danger small" onclick="removeStaff('${u.email}')">
+          Remove
+        </button>
+      </div>
     `;
+
     box.appendChild(row);
   });
 }
+
 
 }
 function applyRoleRestrictions(){
@@ -619,6 +627,7 @@ async function saveBackupToFolder() {
   await w.write(JSON.stringify(await getAll(),null,2));
   await w.close();
 }
+
 
 
 
