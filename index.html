@@ -90,6 +90,22 @@
 </section>
 
 </main>
+<section id="managerPanel" class="card hidden">
+  <h2>Manager Settings</h2>
+
+  <h3>Change Manager Password</h3>
+  <input id="newManagerPassword" type="password" placeholder="New manager password">
+  <button class="btn" onclick="changeManagerPassword()">Update</button>
+
+  <hr>
+
+  <h3>Add Staff User</h3>
+  <input id="staffEmail" type="email" placeholder="Staff email">
+  <input id="staffPassword" type="password" placeholder="Staff password">
+  <button class="btn" onclick="addStaff()">Add Staff</button>
+
+  <div id="staffList"></div>
+</section>
 
 <template id="unitTemplate">
   <article class="unit">
@@ -201,5 +217,6 @@
 </footer>
 
 </html>
+
 
 
