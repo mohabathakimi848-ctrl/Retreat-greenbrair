@@ -5,11 +5,18 @@ const DEFAULT_USERS = {
     email: "manager@rjames.com",
     password: "manager123"
   },
-  staff: {
-    email: "staff@rjames.com",
-    password: "staff123"
-  }
+  staff: [
+    {
+      email: "staff@rjames.com",
+      password: "staff123"
+    }
+  ]
 };
+
+let USERS = JSON.parse(localStorage.getItem("USERS")) || DEFAULT_USERS;
+localStorage.setItem("USERS", JSON.stringify(USERS));
+
+let CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
 
 // Load users or init defaults
 let USERS = JSON.parse(localStorage.getItem("USERS")) || DEFAULT_USERS;
@@ -31,22 +38,29 @@ function login(){
   const email = loginEmail.value.trim();
   const password = loginPassword.value.trim();
 
-  const role = Object.keys(USERS).find(r =>
-    USERS[r].email === email &&
-    USERS[r].password === password
-  );
+  if (
+    USERS.manager.email === email &&
+    USERS.manager.password === password
+  ) {
+    CURRENT_USER = { role: "manager", email };
+  } else {
+    const staffUser = USERS.staff.find(
+      u => u.email === email && u.password === password
+    );
 
-  if (!role) {
-    loginError.classList.remove("hidden");
-    return;
+    if (!staffUser) {
+      loginError.classList.remove("hidden");
+      return;
+    }
+
+    CURRENT_USER = { role: "staff", email };
   }
 
-  CURRENT_USER = { role, email };
   localStorage.setItem("CURRENT_USER", JSON.stringify(CURRENT_USER));
-
   document.getElementById("loginScreen").classList.add("hidden");
   applyRoleRestrictions();
 }
+
 
 function logout(){
   localStorage.removeItem("CURRENT_USER");
@@ -540,4 +554,5 @@ async function saveBackupToFolder() {
   await w.write(JSON.stringify(await getAll(),null,2));
   await w.close();
 }
+
 
