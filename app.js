@@ -136,6 +136,24 @@ function renderStaffList(){
     box.appendChild(row);
   });
 }
+function resetStaffPassword(email){
+  if (CURRENT_USER.role !== "manager") return;
+
+  const newPwd = prompt(`Enter new password for ${email}`);
+
+  if (!newPwd || newPwd.length < 4) {
+    alert("Password must be at least 4 characters");
+    return;
+  }
+
+  const staff = USERS.staff.find(u => u.email === email);
+  if (!staff) return;
+
+  staff.password = newPwd;
+  localStorage.setItem("USERS", JSON.stringify(USERS));
+
+  alert(`Password reset for ${email}`);
+}
 
 
 }
@@ -627,6 +645,7 @@ async function saveBackupToFolder() {
   await w.write(JSON.stringify(await getAll(),null,2));
   await w.close();
 }
+
 
 
 
