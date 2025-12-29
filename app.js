@@ -15,10 +15,10 @@ localStorage.setItem("USERS", JSON.stringify(USERS));
 
 let CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
 
-// 🔐 LOGIN ELEMENTS
+// 🔐 Login elements
 let loginEmail, loginPassword, loginError;
 
-// 🧱 APP ELEMENTS (FIX)
+// 🧱 App elements
 let propertySelect, propertyTitle;
 let pickFolderBtn, saveFolderBtn, logoutBtn;
 let unitForm, search, unitList, unitTemplate;
@@ -28,12 +28,12 @@ let managerPanel, staffList;
 
 document.addEventListener("DOMContentLoaded", () => {
 
-  // 🔐 LOGIN
+  // Login
   loginEmail = document.getElementById("loginEmail");
   loginPassword = document.getElementById("loginPassword");
   loginError = document.getElementById("loginError");
 
-  // 🧱 APP
+  // App
   propertySelect = document.getElementById("propertySelect");
   propertyTitle = document.getElementById("propertyTitle");
   pickFolderBtn = document.getElementById("pickFolderBtn");
@@ -63,11 +63,12 @@ function lockApp(){
   document.getElementById("appRoot").classList.add("hidden");
 }
 
-function unlockApp(){
+async function unlockApp(){
   document.getElementById("loginScreen").classList.add("hidden");
   document.getElementById("appRoot").classList.remove("hidden");
-  applyRoleRestrictions();
-  initApp();
+
+  await initApp();          // ✅ INIT FIRST
+  applyRoleRestrictions(); // ✅ THEN RESTRICT
 }
 
 function login(){
@@ -107,6 +108,7 @@ function applyRoleRestrictions(){
     return;
   }
 
+  // Staff restrictions
   managerPanel.remove();
   document.querySelectorAll(".deleteUnit,.pdfBtn").forEach(b => b.remove());
   pickFolderBtn.remove();
@@ -139,6 +141,24 @@ function renderStaffList(){
     `;
     staffList.appendChild(row);
   });
+}
+
+function resetStaffPassword(email){
+  const pwd = prompt(`New password for ${email}`);
+  if (!pwd || pwd.length < 4) return;
+
+  const staff = USERS.staff.find(u => u.email === email);
+  if (!staff) return;
+
+  staff.password = pwd;
+  localStorage.setItem("USERS", JSON.stringify(USERS));
+  alert("Password reset");
+}
+
+function removeStaff(email){
+  USERS.staff = USERS.staff.filter(u => u.email !== email);
+  localStorage.setItem("USERS", JSON.stringify(USERS));
+  renderStaffList();
 }
 
 /* ================= MAIN APP ================= */
