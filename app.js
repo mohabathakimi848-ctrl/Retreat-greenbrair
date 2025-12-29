@@ -15,7 +15,15 @@ localStorage.setItem("USERS", JSON.stringify(USERS));
 
 let CURRENT_USER = JSON.parse(localStorage.getItem("CURRENT_USER"));
 
+// ✅ FIX: bind login elements explicitly (no deletions)
+let loginEmail, loginPassword, loginError;
+
 document.addEventListener("DOMContentLoaded", () => {
+  // ✅ FIX: safe bindings
+  loginEmail = document.getElementById("loginEmail");
+  loginPassword = document.getElementById("loginPassword");
+  loginError = document.getElementById("loginError");
+
   document.getElementById("loginBtn").onclick = login;
   document.getElementById("logoutBtn").onclick = logout;
   document.getElementById("updateManagerPwd").onclick = changeManagerPassword;
